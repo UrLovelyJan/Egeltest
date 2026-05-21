@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ontología del Dominio — Evalúa+</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+
+  {% set active = 'ayuda' %}
+  {% include '_sidebar.html' %}
+
+  <div class="main-content">
+
+    <header class="topbar">
+      <div class="topbar-progress-info">
+        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Ontología del dominio — EGEL-PLUS ISOFT
+      </div>
+      <div class="topbar-user" style="margin-left:auto;">
+        <a href="{{ url_for('index') }}" class="btn btn-outline" style="font-size:0.82rem;">Inicio</a>
+      </div>
+    </header>
+
+    <div class="onto-page">
+
+      <div class="page-heading">Ontología del dominio</div>
+      <div class="page-subheading">Representación jerárquica del conocimiento evaluado en el EGEL-PLUS ISOFT</div>
+
+      <!-- Diagrama SVG -->
+      <div class="card fade-up" style="margin-bottom:18px;">
+        <div class="card-body">
+          <div class="onto-wrap">
+            <svg viewBox="0 0 1040 560" xmlns="http://www.w3.org/2000/svg"
+                 width="100%" style="max-width:1040px;display:block;margin:0 auto;font-family:'DM Sans',sans-serif;">
+
+              <!-- Conexiones raíz → temas -->
+              <line x1="520" y1="54" x2="130" y2="130" stroke="#d0d7e3" stroke-width="1.5"/>
+              <line x1="520" y1="54" x2="360" y2="130" stroke="#d0d7e3" stroke-width="1.5"/>
+              <line x1="520" y1="54" x2="680" y2="130" stroke="#d0d7e3" stroke-width="1.5"/>
+              <line x1="520" y1="54" x2="910" y2="130" stroke="#d0d7e3" stroke-width="1.5"/>
+
+              <!-- Conexiones temas → subtemas -->
+              <line x1="130" y1="166" x2="50"  y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="130" y1="166" x2="130" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="130" y1="166" x2="210" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+
+              <line x1="360" y1="166" x2="290" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="360" y1="166" x2="360" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="360" y1="166" x2="430" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+
+              <line x1="680" y1="166" x2="610" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="680" y1="166" x2="680" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="680" y1="166" x2="750" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+
+              <line x1="910" y1="166" x2="840" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="910" y1="166" x2="910" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+              <line x1="910" y1="166" x2="980" y2="246" stroke="#e4e9f0" stroke-width="1.2"/>
+
+              <!-- Conexiones subtemas → hojas -->
+              <line x1="50"  y1="276" x2="30"  y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="50"  y1="276" x2="70"  y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="130" y1="276" x2="110" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="130" y1="276" x2="150" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="210" y1="276" x2="190" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="210" y1="276" x2="230" y2="350" stroke="#eaecf0" stroke-width="1"/>
+
+              <line x1="290" y1="276" x2="270" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="290" y1="276" x2="310" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="360" y1="276" x2="340" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="360" y1="276" x2="380" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="430" y1="276" x2="410" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="430" y1="276" x2="450" y2="350" stroke="#eaecf0" stroke-width="1"/>
+
+              <line x1="610" y1="276" x2="590" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="610" y1="276" x2="630" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="680" y1="276" x2="660" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="680" y1="276" x2="700" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="750" y1="276" x2="730" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="750" y1="276" x2="770" y2="350" stroke="#eaecf0" stroke-width="1"/>
+
+              <line x1="840" y1="276" x2="820" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="840" y1="276" x2="860" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="910" y1="276" x2="890" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="910" y1="276" x2="930" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="980" y1="276" x2="960" y2="350" stroke="#eaecf0" stroke-width="1"/>
+              <line x1="980" y1="276" x2="1000" y2="350" stroke="#eaecf0" stroke-width="1"/>
+
+              <!-- NODO RAÍZ -->
+              <rect x="370" y="18" width="300" height="44" rx="8" fill="#0f1f3d"/>
+              <text x="520" y="36" text-anchor="middle" fill="white" font-size="12" font-weight="700">Ingeniería de Software</text>
+              <text x="520" y="52" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9">EGEL-PLUS ISOFT · CENEVAL</text>
+
+              <!-- TEMAS PRINCIPALES -->
+              <rect x="50"  y="130" width="160" height="42" rx="7" fill="#1a2f50"/>
+              <text x="130" y="147" text-anchor="middle" fill="white" font-size="10" font-weight="700">Gestión de</text>
+              <text x="130" y="161" text-anchor="middle" fill="white" font-size="10" font-weight="700">Proyectos</text>
+
+              <rect x="280" y="130" width="160" height="42" rx="7" fill="#1a2f50"/>
+              <text x="360" y="147" text-anchor="middle" fill="white" font-size="10" font-weight="700">Proceso de</text>
+              <text x="360" y="161" text-anchor="middle" fill="white" font-size="10" font-weight="700">Desarrollo</text>
+
+              <rect x="600" y="130" width="160" height="42" rx="7" fill="#1a2f50"/>
+              <text x="680" y="147" text-anchor="middle" fill="white" font-size="10" font-weight="700">Calidad de</text>
+              <text x="680" y="161" text-anchor="middle" fill="white" font-size="10" font-weight="700">Software</text>
+
+              <rect x="830" y="130" width="160" height="42" rx="7" fill="#1a2f50"/>
+              <text x="910" y="147" text-anchor="middle" fill="white" font-size="10" font-weight="700">Planeación</text>
+              <text x="910" y="161" text-anchor="middle" fill="white" font-size="10" font-weight="700">Estratégica TI</text>
+
+              <!-- SUBTEMAS -->
+              {% set subs = [
+                (16,246,78,'Alcance / EDT'),
+                (96,246,78,'Tiempo / PERT'),
+                (175,246,78,'Costo / Est.'),
+                (251,246,78,'Metodologías'),
+                (321,246,78,'Riesgos'),
+                (390,246,78,'Estimación'),
+                (571,246,78,'Normas ISO'),
+                (641,246,78,'Métricas'),
+                (711,246,78,'Auditoría'),
+                (801,246,78,'Estrategia'),
+                (871,246,78,'Seguridad'),
+                (941,246,78,'Arq. TI')
+              ] %}
+              {% for x, y, w, label in subs %}
+              <rect x="{{ x }}" y="{{ y }}" width="{{ w }}" height="32" rx="6" fill="#1a9e8f"/>
+              <text x="{{ x + w//2 }}" y="{{ y + 20 }}" text-anchor="middle" fill="white" font-size="9" font-weight="600">{{ label }}</text>
+              {% endfor %}
+
+              <!-- HOJAS -->
+              {% set hojas = [
+                (0,350,60,'Entregables'),(62,350,60,'Restricciones'),
+                (80,350,60,'Gantt'),(142,350,60,'Ruta crítica'),
+                (160,350,62,'COCOMO'),(224,350,62,'Analogía'),
+                (240,350,62,'Cascada'),(304,350,62,'RUP/Ágil'),
+                (310,350,62,'Impacto'),(374,350,62,'Probabilidad'),
+                (380,350,62,'Pts. Función'),(444,350,62,'LOC/SLOC'),
+                (560,350,64,'ISO 9126'),(626,350,64,'ISO 25000'),
+                (630,350,64,'Compl. cícl.'),(696,350,64,'Densidad'),
+                (700,350,64,'ISO 15504'),(766,350,64,'SPICE/CMMI'),
+                (790,350,62,'FODA'),(854,350,62,'Modelo neg.'),
+                (860,350,64,'Ctrl. acceso'),(926,350,64,'ISO 27002'),
+                (930,350,62,'Hardware'),(994,350,62,'Redes/TIC')
+              ] %}
+              {% for x, y, w, label in hojas %}
+              <rect x="{{ x }}" y="{{ y }}" width="{{ w }}" height="26" rx="5" fill="white" stroke="#e4e9f0" stroke-width="1"/>
+              <text x="{{ x + w//2 }}" y="{{ y + 17 }}" text-anchor="middle" fill="#5a6480" font-size="8.5">{{ label }}</text>
+              {% endfor %}
+
+              <!-- Leyenda -->
+              <rect x="40" y="420" width="130" height="26" rx="5" fill="#0f1f3d"/>
+              <text x="105" y="437" text-anchor="middle" fill="white" font-size="9">Dominio raíz</text>
+
+              <rect x="185" y="420" width="130" height="26" rx="5" fill="#1a2f50"/>
+              <text x="250" y="437" text-anchor="middle" fill="white" font-size="9">Área temática</text>
+
+              <rect x="330" y="420" width="130" height="26" rx="5" fill="#1a9e8f"/>
+              <text x="395" y="437" text-anchor="middle" fill="white" font-size="9">Subcategoría</text>
+
+              <rect x="475" y="420" width="130" height="26" rx="5" fill="white" stroke="#e4e9f0" stroke-width="1"/>
+              <text x="540" y="437" text-anchor="middle" fill="#5a6480" font-size="9">Concepto hoja</text>
+
+              <text x="40" y="470" fill="#9aa3b5" font-size="9">Leyenda: la ontología organiza el conocimiento del dominio de Ingeniería de Software en 4 áreas, 12 subcategorías y 24+ conceptos específicos.</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción por área -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;" class="fade-up" style="animation-delay:.08s;">
+        {% set areas = [
+          ('Gestión de Proyectos', 'Alcance (EDT/WBS), Tiempo (PERT, Gantt, ruta crítica), Costo (COCOMO, estimación paramétrica, analogía). Basado en PMBOK 6ª ed.'),
+          ('Proceso de Desarrollo', 'Metodologías (RUP, cascada, Ágil/SCRUM), gestión de riesgos (probabilidad, impacto, mitigación), estimación (puntos de función, LOC).'),
+          ('Calidad de Software', 'Normas ISO 9126, ISO 25000, 12207, 15504 (SPICE). Métricas: complejidad ciclomática, densidad de comentarios. Auditoría CMMI.'),
+          ('Planeación Estratégica TI', 'Estrategia (FODA, modelo de negocios), seguridad (ISO 27002, control de accesos, niveles de seguridad), arquitectura TI.')
+        ] %}
+        {% for nombre, desc in areas %}
+        <div class="card">
+          <div class="card-body-sm">
+            <div style="font-size:0.83rem;font-weight:700;color:var(--text-1);margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border);">{{ nombre }}</div>
+            <div style="font-size:0.78rem;color:var(--text-3);line-height:1.5;">{{ desc }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div style="margin-top:20px;">
+        <a href="{{ url_for('index') }}" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+          Volver al inicio
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
