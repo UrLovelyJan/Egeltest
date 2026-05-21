@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultado de ronda — Evalúa+</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+
+  {% set active = 'resultados' %}
+  {% include '_sidebar.html' %}
+
+  <div class="main-content">
+
+    <header class="topbar">
+      <div class="topbar-progress-info">
+        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        Pregunta {{ preguntas_usadas }} de {{ max_preguntas }}
+      </div>
+      <div class="topbar-track">
+        <div class="topbar-fill" style="width:{{ ((preguntas_usadas / max_preguntas) * 100)|round|int }}%"></div>
+      </div>
+      <div class="topbar-pct">{{ ((preguntas_usadas / max_preguntas) * 100)|round|int }}%</div>
+      <div class="topbar-user" style="margin-left:auto;">
+        <div class="avatar">{{ estudiante.nombre[0]|upper }}</div>
+        <div>
+          <div class="user-name">{{ estudiante.nombre }}</div>
+          <div class="user-role">Examinante</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- Columna principal -->
+      <div class="question-area">
+
+        <!-- Score -->
+        <div class="card fade-up" style="margin-bottom:16px;">
+          <div class="card-body" style="text-align:center;padding:28px 24px;">
+            <div class="score-ring {{ 'r-great' if aciertos >= 4 else ('r-mid' if aciertos >= 2 else 'r-poor') }}">
+              <div class="score-num">{{ aciertos }}/{{ total }}</div>
+              <div class="score-denom">{{ porcentaje_ronda }}%</div>
+            </div>
+            <div style="font-size:1.05rem;font-weight:700;margin-bottom:4px;">{{ feedback.titulo }}</div>
+            <div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap;">
+              <span class="chip chip-navy">{{ ronda.tema_nombre | truncate(30) }}</span>
+              <span class="chip chip-teal">Nivel {{ ronda.dificultad }}/3</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Retroalimentación del tutor -->
+        <div class="card fade-up" style="margin-bottom:16px;animation-delay:.06s;">
+          <div class="card-body">
+            <div class="section-title">Retroalimentación del tutor</div>
+
+            <div style="border-left:3px solid {{ 'var(--green)' if feedback.tipo in ['excelente','bien'] else ('var(--amber)' if feedback.tipo == 'regular' else 'var(--red)') }};
+                        padding-left:14px;margin-bottom:14px;">
+              <div style="font-weight:600;font-size:0.93rem;margin-bottom:4px;">{{ feedback.mensaje }}</div>
+              <div style="font-size:0.83rem;color:var(--text-2);">{{ feedback.recomendacion }}</div>
+            </div>
+
+            <!-- Decisión del motor de inferencia -->
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;">
+              <div class="section-title" style="margin-bottom:6px;">Decisión del sistema adaptativo</div>
+              <div style="font-size:0.87rem;color:var(--text-1);">
+                {% if estado_inferido.accion == 'avanzar' %}
+                  <strong style="color:var(--green);">Avanzar al siguiente tema</strong> —
+                {% elif estado_inferido.accion == 'forzar' %}
+                  <strong style="color:var(--amber);">Avance forzado al siguiente tema</strong> —
+                {% else %}
+                  <strong style="color:var(--teal);">Repetir tema con nivel {{ estado_inferido.nueva_dificultad }}/3</strong> —
+                {% endif %}
+                {{ estado_inferido.mensaje }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalle de reactivos -->
+        <div class="card fade-up" style="animation-delay:.12s;">
+          <div class="card-body">
+            <div class="section-title">Revisión de respuestas</div>
+
+            {% for resp in ronda.respuestas %}
+            <div class="reactivo-result {{ 'r-correct' if resp.es_correcta else 'r-wrong' }}" id="r-{{ loop.index }}">
+              <div class="reactivo-header" onclick="toggleReactivo('{{ loop.index }}')">
+                <span class="res-badge {{ 'rb-correct' if resp.es_correcta else 'rb-wrong' }}">
+                  {{ 'Correcta' if resp.es_correcta else 'Incorrecta' }}
+                </span>
+                <span style="font-size:0.85rem;font-weight:500;flex:1;color:var(--text-1);">
+                  {{ resp.pregunta_texto }}
+                </span>
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--text-3)" fill="none" stroke-width="2" id="chevron-{{ loop.index }}"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+
+              <div class="reactivo-body" id="body-{{ loop.index }}">
+                {% if resp.contexto %}
+                <div style="font-size:0.8rem;color:var(--text-3);font-style:italic;margin-bottom:8px;">{{ resp.contexto | truncate(120) }}</div>
+                {% endif %}
+
+                <div class="opts-summary">
+                  {% for clave, texto in resp.opciones.items() %}
+                  <span class="opt-tag
+                    {{ 't-correct' if clave == resp.respuesta_correcta else ('t-wrong' if clave == resp.respuesta_usuario and not resp.es_correcta else '') }}">
+                    {{ clave }}) {{ texto | truncate(30) }}
+                    {% if clave == resp.respuesta_correcta %} ✓{% endif %}
+                  </span>
+                  {% endfor %}
+                </div>
+
+                <div class="justif-box">
+                  <div class="justif-title">Justificación</div>
+                  {{ resp.justificacion }}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+
+      </div><!-- /question-area -->
+
+      <!-- Panel derecho -->
+      <aside class="side-panel fade-up" style="animation-delay:.1s;">
+        <div class="card">
+          <div class="card-body-sm">
+            <div class="panel-section-title">Resumen de ronda</div>
+            <div class="stat-row">
+              <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div><div class="stat-label">Aciertos</div><div class="stat-value">{{ aciertos }} <span class="stat-sub">de {{ total }}</span></div></div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+              <div><div class="stat-label">Nivel</div><div class="stat-value">{{ ['Básico','Intermedio','Avanzado'][ronda.dificultad-1] }}</div></div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/></svg></div>
+              <div><div class="stat-label">Preguntas totales usadas</div><div class="stat-value">{{ preguntas_usadas }} <span class="stat-sub">de {{ max_preguntas }}</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body-sm">
+            <div class="panel-section-title">Siguiente paso</div>
+            <div style="font-size:0.84rem;color:var(--text-2);line-height:1.55;margin-bottom:14px;">
+              {% if estado_inferido.accion == 'avanzar' %}
+                Pasas al siguiente tema. Mantén el nivel de estudio.
+              {% elif estado_inferido.accion == 'forzar' %}
+                Avanzamos al siguiente tema. Repasa los conceptos de este tema antes del examen real.
+              {% else %}
+                Repite este tema con nivel de dificultad {{ estado_inferido.nueva_dificultad }}/3.
+              {% endif %}
+            </div>
+
+            {% if examen_terminado %}
+              <a href="{{ url_for('final') }}" class="btn btn-teal btn-block">
+                Ver resultado final
+                <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+              </a>
+            {% else %}
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <a href="{{ url_for('iniciar_ronda') }}" class="btn btn-primary btn-block">
+                  {% if estado_inferido.accion in ['repetir'] %}
+                    Continuar ronda
+                  {% else %}
+                    Siguiente tema
+                  {% endif %}
+                  <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                </a>
+                <a href="{{ url_for('temas') }}" class="btn btn-outline btn-block">
+                  Ver temas
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </aside>
+
+    </div><!-- /page-body -->
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+function toggleReactivo(id){
+  const body = document.getElementById('body-'+id);
+  const chev = document.getElementById('chevron-'+id);
+  const open = body.classList.toggle('open');
+  if(chev) chev.style.transform = open ? 'rotate(180deg)' : '';
+}
+</script>
+</body>
+</html>
