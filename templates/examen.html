@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Examen — Evalúa+</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+
+  {% set active = 'examen' %}
+  {% include '_sidebar.html' %}
+
+  <div class="main-content">
+
+    <!-- Topbar con progreso -->
+    <header class="topbar">
+      <div class="topbar-progress-info">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+        Pregunta {{ num_pregunta_global }} de {{ max_preguntas }}
+      </div>
+      <div class="topbar-track">
+        <div class="topbar-fill" style="width:{{ progreso_global }}%"></div>
+      </div>
+      <div class="topbar-pct">{{ progreso_global }}%</div>
+
+      {% if session.get('examen', {}).get('aciertos_seguidos', 0) > 0 %}
+      <div class="topbar-streak">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8 8 4 12 4 16a8 8 0 0016 0c0-4-4-8-8-14z"/></svg>
+        {{ session.get('examen', {}).get('aciertos_seguidos', 0) }} aciertos consecutivos
+      </div>
+      {% endif %}
+
+      <div class="topbar-user">
+        <div class="avatar">{{ estudiante.nombre[0]|upper }}</div>
+        <div>
+          <div class="user-name">{{ estudiante.nombre }}</div>
+          <div class="user-role">Examinante</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Body: pregunta + panel derecho -->
+    <div class="page-body">
+
+      <!-- Área central -->
+      <div class="question-area fade-up">
+        <div class="card">
+          <div class="card-body">
+
+            <!-- Chips de contexto -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="chip chip-navy">
+                  <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  {{ tema_nombre | truncate(28) }}
+                </span>
+                <span class="chip chip-teal">
+                  <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  {{ ['Básico', 'Intermedio', 'Avanzado'][dificultad - 1] }}
+                </span>
+              </div>
+              <button style="background:none;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:5px 8px;color:var(--text-3);cursor:pointer;" title="Marcar para revisar">
+                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="1.8"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+              </button>
+            </div>
+
+            <!-- Caso de estudio -->
+            {% if pregunta.contexto %}
+            <div class="case-label">Caso</div>
+            <p class="case-text">{{ pregunta.contexto }}</p>
+            {% endif %}
+
+            <!-- Pregunta -->
+            <div class="question-text">{{ pregunta.pregunta }}</div>
+
+            <!-- Opciones -->
+            <form method="POST" action="{{ url_for('responder') }}" id="form-respuesta">
+              <div class="option-list">
+                {% for clave, texto in pregunta.opciones.items() %}
+                <label class="option-item" id="opt-{{ clave }}">
+                  <input type="radio" name="respuesta" value="{{ clave }}" required>
+                  <span class="option-key">{{ clave }}</span>
+                  <span class="option-text">{{ texto }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </form>
+
+          </div>
+        </div>
+
+        <!-- Barra de progreso de ronda (bajo la tarjeta) -->
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+          <div style="font-size:0.78rem;color:var(--text-3);white-space:nowrap;">
+            Pregunta {{ num_pregunta }} de {{ total_ronda }} en esta ronda
+          </div>
+          <div class="progress-track" style="flex:1;">
+            <div class="progress-fill" style="width:{{ progreso_ronda }}%"></div>
+          </div>
+          <div style="font-size:0.78rem;font-weight:600;color:var(--text-2);font-family:'DM Mono',monospace;">
+            {{ progreso_ronda }}%
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel derecho -->
+      <aside class="side-panel fade-up" style="animation-delay:.08s;">
+
+        <!-- Resumen del desempeño -->
+        <div class="card">
+          <div class="card-body-sm">
+            <div class="panel-section-title">Resumen del desempeño</div>
+
+            <div class="stat-row">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Puntaje actual</div>
+                <div class="stat-value">
+                  {{ session.get('examen', {}).get('total_preguntas', 0) * 40 }}
+                  <span class="stat-sub">de 1000</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="12" y2="12"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Preguntas respondidas</div>
+                <div class="stat-value">
+                  {{ num_pregunta_global - 1 }}
+                  <span class="stat-sub">de {{ max_preguntas }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <div class="stat-label">Tiempo restante</div>
+                <div class="stat-value" id="timer" style="font-family:'DM Mono',monospace;">--:--:--</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Retroalimentación adaptativa -->
+        <div class="card">
+          <div class="card-body-sm">
+            <div class="feedback-panel">
+              <div class="feedback-panel-title">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Retroalimentación adaptativa
+              </div>
+              {% set historial = session.get('examen', {}).get('historial_rondas', []) %}
+              {% if historial %}
+                {% set ultima = historial[-1] %}
+                {% set pct_ultima = ((ultima.aciertos / ultima.total) * 100)|round|int %}
+                {% if pct_ultima >= 60 %}
+                  Vas por buen camino. Tu desempeño indica comprensión del tema. Las siguientes preguntas se adaptarán para retarte un poco más.
+                {% else %}
+                  Este tema requiere más práctica. Lee con atención cada opción antes de responder y revisa las justificaciones al terminar la ronda.
+                {% endif %}
+              {% else %}
+                Comenzando el simulacro. Tómate el tiempo necesario para leer cada caso con atención antes de responder.
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Nivel de dificultad -->
+        <div class="card">
+          <div class="card-body-sm">
+            <div class="diff-row">
+              <span>Nivel de dificultad actual</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="var(--text-3)" fill="none" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="diff-value" style="margin-top:6px;">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              {{ ['Básico', 'Intermedio', 'Avanzado'][dificultad - 1] }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Consejo -->
+        <div class="card">
+          <div class="card-body-sm">
+            <div class="consejo-row">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>
+                <strong style="font-size:0.8rem;color:var(--text-1);">Consejo</strong><br>
+                Lee cuidadosamente el caso y analiza cada opción antes de responder.
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+    </div><!-- /page-body -->
+
+    <!-- Bottom bar fija -->
+    <div class="bottom-bar">
+      <button class="btn btn-outline" onclick="marcarRevisar()" type="button">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        Marcar para revisar
+      </button>
+
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-outline" id="btn-enviar-outline" disabled
+                onclick="document.getElementById('form-respuesta').submit()">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Enviar respuesta
+        </button>
+        <button class="btn btn-primary" id="btn-siguiente" disabled
+                onclick="document.getElementById('form-respuesta').submit()">
+          Siguiente
+          <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  // Timer de sesión (90 minutos)
+  (function(){
+    const key = 'exam_start_{{ session.get("estudiante", {}).get("fecha", "") }}';
+    let start = sessionStorage.getItem(key);
+    if(!start){ start = Date.now(); sessionStorage.setItem(key, start); }
+    const total = 20 * 60 * 1000;
+    function tick(){
+      const elapsed = Date.now() - parseInt(start);
+      const left = Math.max(0, total - elapsed);
+      const h = String(Math.floor(left/3600000)).padStart(2,'0');
+      const m = String(Math.floor((left%3600000)/60000)).padStart(2,'0');
+      const s = String(Math.floor((left%60000)/1000)).padStart(2,'0');
+      const el = document.getElementById('timer');
+      if(el) el.textContent = h+':'+m+':'+s;
+    }
+    tick(); setInterval(tick,1000);
+  })();
+</script>
+</body>
+</html>
